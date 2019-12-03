@@ -9,12 +9,13 @@ from binascii import b2a_hex
 ### pdf-miner requirements
 ###
 
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdfdocument import PDFDocument, PDFNoOutlines
-from pdfminer.pdfpage import PDFPage
+from pdfminer.pdfparser import PDFParser, PDFPage, PDFDocument, PDFNoOutlines
+# from pdfminer.pdfdocument import PDFDocument, PDFNoOutlines
+# from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTTextBox, LTTextLine, LTFigure, LTImage, LTChar
+
 
 def with_pdf (pdf_doc, fn, pdf_pwd, *args):
     """Open the pdf document, and apply the function, returning the results"""
@@ -28,6 +29,7 @@ def with_pdf (pdf_doc, fn, pdf_pwd, *args):
         doc = PDFDocument(parser)
         # connect the parser and document objects
         parser.set_document(doc)
+        doc.set_parser(parser)
         # supply the password for initialization
         doc.initialize(pdf_pwd)
 
@@ -190,7 +192,7 @@ def _parse_pages (doc, images_folder):
     interpreter = PDFPageInterpreter(rsrcmgr, device)
 
     text_content = []
-    for i, page in enumerate(PDFPage.create_pages(doc)):
+    for i, page in enumerate(doc.get_pages()):
         interpreter.process_page(page)
         # receive the LTPage object for this page
         layout = device.get_result()
